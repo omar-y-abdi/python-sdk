@@ -39,7 +39,7 @@ UNICODE_TEST_STRINGS = {
 }
 
 
-def make_unicode_server_app() -> Starlette:  # pragma: no cover
+def make_unicode_server_app() -> Starlette:
     """Create the Unicode test server app."""
 
     async def handle_list_tools(
@@ -72,7 +72,7 @@ def make_unicode_server_app() -> Starlette:  # pragma: no cover
                     )
                 ]
             )
-        else:
+        else:  # pragma: no cover
             raise ValueError(f"Unknown tool: {params.name}")
 
     async def handle_list_prompts(
@@ -103,7 +103,7 @@ def make_unicode_server_app() -> Starlette:  # pragma: no cover
                     )
                 ]
             )
-        raise ValueError(f"Unknown prompt: {params.name}")
+        raise ValueError(f"Unknown prompt: {params.name}")  # pragma: no cover
 
     server = Server(
         name="unicode_test_server",

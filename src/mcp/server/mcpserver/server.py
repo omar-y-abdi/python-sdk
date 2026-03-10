@@ -926,7 +926,7 @@ class MCPServer(Generic[LifespanResultT]):
 
         sse = SseServerTransport(message_path, security_settings=transport_security)
 
-        async def handle_sse(scope: Scope, receive: Receive, send: Send):  # pragma: no cover
+        async def handle_sse(scope: Scope, receive: Receive, send: Send):
             # Add client ID from auth context into request context if available
 
             async with sse.connect_sse(scope, receive, send) as streams:
@@ -998,7 +998,7 @@ class MCPServer(Generic[LifespanResultT]):
         else:
             # Auth is disabled, no need for RequireAuthMiddleware
             # Since handle_sse is an ASGI app, we need to create a compatible endpoint
-            async def sse_endpoint(request: Request) -> Response:  # pragma: no cover
+            async def sse_endpoint(request: Request) -> Response:
                 # Convert the Starlette request to ASGI parameters
                 return await handle_sse(request.scope, request.receive, request._send)  # type: ignore[reportPrivateUsage]
 

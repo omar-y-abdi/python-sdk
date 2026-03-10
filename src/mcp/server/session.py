@@ -222,7 +222,7 @@ class ServerSession(
             related_request_id,
         )
 
-    async def send_resource_updated(self, uri: str | AnyUrl) -> None:  # pragma: no cover
+    async def send_resource_updated(self, uri: str | AnyUrl) -> None:
         """Send a resource updated notification."""
         await self.send_notification(
             types.ResourceUpdatedNotification(
@@ -474,7 +474,7 @@ class ServerSession(
             related_request_id,
         )
 
-    async def send_resource_list_changed(self) -> None:  # pragma: no cover
+    async def send_resource_list_changed(self) -> None:
         """Send a resource list changed notification."""
         await self.send_notification(types.ResourceListChangedNotification())
 

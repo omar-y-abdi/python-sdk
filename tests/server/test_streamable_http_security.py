@@ -18,15 +18,15 @@ from tests.test_helpers import run_uvicorn_in_thread
 SERVER_NAME = "test_streamable_http_security_server"
 
 
-class SecurityTestServer(Server):  # pragma: no cover
+class SecurityTestServer(Server):
     def __init__(self):
         super().__init__(SERVER_NAME)
 
-    async def on_list_tools(self) -> list[Tool]:
+    async def on_list_tools(self) -> list[Tool]:  # pragma: no cover
         return []
 
 
-def make_server_app(security_settings: TransportSecuritySettings | None = None) -> Starlette:  # pragma: no cover
+def make_server_app(security_settings: TransportSecuritySettings | None = None) -> Starlette:
     """Create the StreamableHTTP server app with specified security settings."""
     app = SecurityTestServer()
 

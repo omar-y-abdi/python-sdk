@@ -19,15 +19,15 @@ logger = logging.getLogger(__name__)
 SERVER_NAME = "test_sse_security_server"
 
 
-class SecurityTestServer(Server):  # pragma: no cover
+class SecurityTestServer(Server):
     def __init__(self):
         super().__init__(SERVER_NAME)
 
-    async def on_list_tools(self) -> list[Tool]:
+    async def on_list_tools(self) -> list[Tool]:  # pragma: no cover
         return []
 
 
-def make_server_app(security_settings: TransportSecuritySettings | None = None) -> Starlette:  # pragma: no cover
+def make_server_app(security_settings: TransportSecuritySettings | None = None) -> Starlette:
     """Create the SSE server app with specified security settings."""
     app = SecurityTestServer()
     sse_transport = SseServerTransport("/messages/", security_settings)
@@ -35,7 +35,7 @@ def make_server_app(security_settings: TransportSecuritySettings | None = None) 
     async def handle_sse(request: Request):
         try:
             async with sse_transport.connect_sse(request.scope, request.receive, request._send) as streams:
-                if streams:
+                if streams:  # pragma: no branch
                     await app.run(streams[0], streams[1], app.create_initialization_options())
         except ValueError as e:
             # Validation error was already handled inside connect_sse

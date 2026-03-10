@@ -43,14 +43,12 @@ from tests.test_helpers import run_uvicorn_in_thread
 SERVER_NAME = "test_server_for_SSE"
 
 
-async def _handle_read_resource(  # pragma: no cover
-    ctx: ServerRequestContext, params: ReadResourceRequestParams
-) -> ReadResourceResult:
+async def _handle_read_resource(ctx: ServerRequestContext, params: ReadResourceRequestParams) -> ReadResourceResult:
     uri = str(params.uri)
     parsed = urlparse(uri)
     if parsed.scheme == "foobar":
         text = f"Read {parsed.netloc}"
-    elif parsed.scheme == "slow":
+    elif parsed.scheme == "slow":  # pragma: no cover
         await anyio.sleep(2.0)
         text = f"Slow response from {parsed.netloc}"
     else:
@@ -78,7 +76,7 @@ async def _handle_call_tool(  # pragma: no cover
     return CallToolResult(content=[TextContent(type="text", text=f"Called {params.name}")])
 
 
-def _create_server() -> Server:  # pragma: no cover
+def _create_server() -> Server:
     return Server(
         SERVER_NAME,
         on_read_resource=_handle_read_resource,
@@ -88,7 +86,7 @@ def _create_server() -> Server:  # pragma: no cover
 
 
 # Test fixtures
-def make_server_app() -> Starlette:  # pragma: no cover
+def make_server_app() -> Starlette:
     """Create test Starlette app with SSE transport"""
     # Configure security with allowed hosts/origins for testing
     security_settings = TransportSecuritySettings(
@@ -284,11 +282,9 @@ async def test_sse_client_basic_connection_mounted_app(mounted_server_url: str) 
             assert isinstance(ping_result, EmptyResult)
 
 
-async def _handle_context_call_tool(  # pragma: no cover
-    ctx: ServerRequestContext, params: CallToolRequestParams
-) -> CallToolResult:
+async def _handle_context_call_tool(ctx: ServerRequestContext, params: CallToolRequestParams) -> CallToolResult:
     headers_info: dict[str, Any] = {}
-    if ctx.request:
+    if ctx.request:  # pragma: no branch
         headers_info = dict(ctx.request.headers)
 
     if params.name == "echo_headers":
@@ -300,10 +296,10 @@ async def _handle_context_call_tool(  # pragma: no cover
         }
         return CallToolResult(content=[TextContent(type="text", text=json.dumps(context_data))])
 
-    return CallToolResult(content=[TextContent(type="text", text=f"Called {params.name}")])
+    return CallToolResult(content=[TextContent(type="text", text=f"Called {params.name}")])  # pragma: no cover
 
 
-async def _handle_context_list_tools(  # pragma: no cover
+async def _handle_context_list_tools(
     ctx: ServerRequestContext, params: PaginatedRequestParams | None
 ) -> ListToolsResult:
     return ListToolsResult(
@@ -326,7 +322,7 @@ async def _handle_context_list_tools(  # pragma: no cover
     )
 
 
-def make_context_server_app() -> Starlette:  # pragma: no cover
+def make_context_server_app() -> Starlette:
     """Build a server app that captures and echoes request context via tools."""
     security_settings = TransportSecuritySettings(
         allowed_hosts=["127.0.0.1:*", "localhost:*"], allowed_origins=["http://127.0.0.1:*", "http://localhost:*"]

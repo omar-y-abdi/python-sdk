@@ -83,7 +83,7 @@ class NotificationCollector:
                 self.tool_notifications.append(message.params)
 
 
-def make_transport_app(module_name: str, transport: str) -> Starlette:  # pragma: no cover
+def make_transport_app(module_name: str, transport: str) -> Starlette:
     """Create server app for the specified example module and transport."""
     # Get the MCP instance based on module name
     if module_name == "basic_tool":
@@ -106,7 +106,7 @@ def make_transport_app(module_name: str, transport: str) -> Starlette:  # pragma
         mcp = mcpserver_quickstart.mcp
     elif module_name == "structured_output":
         mcp = structured_output.mcp
-    else:
+    else:  # pragma: no cover
         raise ImportError(f"Unknown module: {module_name}")
 
     # Create app based on transport type
@@ -114,7 +114,7 @@ def make_transport_app(module_name: str, transport: str) -> Starlette:  # pragma
         return mcp.sse_app()
     elif transport == "streamable-http":
         return mcp.streamable_http_app()
-    else:
+    else:  # pragma: no cover
         raise ValueError(f"Invalid transport for test server: {transport}")
 
 

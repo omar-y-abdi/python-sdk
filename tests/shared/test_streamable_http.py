@@ -104,7 +104,7 @@ class SimpleEventStore(EventStore):
         self._events.append((stream_id, event_id, message))
         return event_id
 
-    async def replay_events_after(  # pragma: no cover
+    async def replay_events_after(
         self,
         last_event_id: EventId,
         send_callback: EventCallback,
@@ -113,11 +113,11 @@ class SimpleEventStore(EventStore):
         # Find the stream ID of the last event
         target_stream_id = None
         for stream_id, event_id, _ in self._events:
-            if event_id == last_event_id:
+            if event_id == last_event_id:  # pragma: no branch
                 target_stream_id = stream_id
                 break
 
-        if target_stream_id is None:
+        if target_stream_id is None:  # pragma: no cover
             # If event ID not found, return None
             return None
 
@@ -128,7 +128,7 @@ class SimpleEventStore(EventStore):
         for stream_id, event_id, message in self._events:
             if stream_id == target_stream_id and int(event_id) > last_event_id_int:
                 # Skip priming events (None message)
-                if message is not None:
+                if message is not None:  # pragma: no branch
                     await send_callback(EventMessage(message, event_id))
 
         return target_stream_id
@@ -140,18 +140,18 @@ class ServerState:
 
 
 @asynccontextmanager
-async def _server_lifespan(_server: Server[ServerState]) -> AsyncIterator[ServerState]:  # pragma: no cover
+async def _server_lifespan(_server: Server[ServerState]) -> AsyncIterator[ServerState]:
     yield ServerState()
 
 
-async def _handle_read_resource(  # pragma: no cover
+async def _handle_read_resource(
     ctx: ServerRequestContext[ServerState], params: ReadResourceRequestParams
 ) -> ReadResourceResult:
     uri = str(params.uri)
     parsed = urlparse(uri)
     if parsed.scheme == "foobar":
         text = f"Read {parsed.netloc}"
-    elif parsed.scheme == "slow":
+    elif parsed.scheme == "slow":  # pragma: no cover
         await anyio.sleep(2.0)
         text = f"Slow response from {parsed.netloc}"
     else:
@@ -159,7 +159,7 @@ async def _handle_read_resource(  # pragma: no cover
     return ReadResourceResult(contents=[TextResourceContents(uri=uri, text=text, mime_type="text/plain")])
 
 
-async def _handle_list_tools(  # pragma: no cover
+async def _handle_list_tools(
     ctx: ServerRequestContext[ServerState], params: PaginatedRequestParams | None
 ) -> ListToolsResult:
     return ListToolsResult(
@@ -224,9 +224,7 @@ async def _handle_list_tools(  # pragma: no cover
     )
 
 
-async def _handle_call_tool(  # pragma: no cover
-    ctx: ServerRequestContext[ServerState], params: CallToolRequestParams
-) -> CallToolResult:
+async def _handle_call_tool(ctx: ServerRequestContext[ServerState], params: CallToolRequestParams) -> CallToolResult:
     name = params.name
     args = params.arguments or {}
 
@@ -235,7 +233,7 @@ async def _handle_call_tool(  # pragma: no cover
         await ctx.session.send_resource_updated(uri="http://test_resource")
         return CallToolResult(content=[TextContent(type="text", text=f"Called {name}")])
 
-    elif name == "long_running_with_checkpoints":
+    elif name == "long_running_with_checkpoints":  # pragma: no cover
         await ctx.session.send_log_message(
             level="info",
             data="Tool started",
@@ -268,7 +266,7 @@ async def _handle_call_tool(  # pragma: no cover
 
         if sampling_result.content.type == "text":
             response = sampling_result.content.text
-        else:
+        else:  # pragma: no cover
             response = str(sampling_result.content)
         return CallToolResult(
             content=[
@@ -356,7 +354,7 @@ async def _handle_call_tool(  # pragma: no cover
                 related_request_id=ctx.request_id,
             )
 
-            if ctx.close_sse_stream:
+            if ctx.close_sse_stream:  # pragma: no branch
                 await ctx.close_sse_stream()
 
             await anyio.sleep(sleep_time)
@@ -367,7 +365,7 @@ async def _handle_call_tool(  # pragma: no cover
         await ctx.session.send_resource_updated(uri="http://notification_1")
         await anyio.sleep(0.1)
 
-        if ctx.close_standalone_sse_stream:
+        if ctx.close_standalone_sse_stream:  # pragma: no branch
             await ctx.close_standalone_sse_stream()
 
         await anyio.sleep(1.5)
@@ -378,7 +376,7 @@ async def _handle_call_tool(  # pragma: no cover
     return CallToolResult(content=[TextContent(type="text", text=f"Called {name}")])
 
 
-def _create_server() -> Server[ServerState]:  # pragma: no cover
+def _create_server() -> Server[ServerState]:
     return Server(
         SERVER_NAME,
         lifespan=_server_lifespan,
@@ -392,7 +390,7 @@ def create_app(
     is_json_response_enabled: bool = False,
     event_store: EventStore | None = None,
     retry_interval: int | None = None,
-) -> Starlette:  # pragma: no cover
+) -> Starlette:
     """Create a Starlette application for testing using the session manager.
 
     Args:
@@ -1352,7 +1350,7 @@ async def test_streamablehttp_server_sampling(basic_server_url: str):
 
 
 # Context-aware server implementation for testing request context propagation
-async def _handle_context_list_tools(  # pragma: no cover
+async def _handle_context_list_tools(
     ctx: ServerRequestContext, params: PaginatedRequestParams | None
 ) -> ListToolsResult:
     return ListToolsResult(
@@ -1377,15 +1375,13 @@ async def _handle_context_list_tools(  # pragma: no cover
     )
 
 
-async def _handle_context_call_tool(  # pragma: no cover
-    ctx: ServerRequestContext, params: CallToolRequestParams
-) -> CallToolResult:
+async def _handle_context_call_tool(ctx: ServerRequestContext, params: CallToolRequestParams) -> CallToolResult:
     name = params.name
     args = params.arguments or {}
 
     if name == "echo_headers":
         headers_info: dict[str, Any] = {}
-        if ctx.request and isinstance(ctx.request, Request):
+        if ctx.request and isinstance(ctx.request, Request):  # pragma: no branch
             headers_info = dict(ctx.request.headers)
         return CallToolResult(content=[TextContent(type="text", text=json.dumps(headers_info))])
 
@@ -1396,17 +1392,17 @@ async def _handle_context_call_tool(  # pragma: no cover
             "method": None,
             "path": None,
         }
-        if ctx.request and isinstance(ctx.request, Request):
+        if ctx.request and isinstance(ctx.request, Request):  # pragma: no branch
             request = ctx.request
             context_data["headers"] = dict(request.headers)
             context_data["method"] = request.method
             context_data["path"] = request.url.path
         return CallToolResult(content=[TextContent(type="text", text=json.dumps(context_data))])
 
-    return CallToolResult(content=[TextContent(type="text", text=f"Unknown tool: {name}")])
+    return CallToolResult(content=[TextContent(type="text", text=f"Unknown tool: {name}")])  # pragma: no cover
 
 
-def create_context_aware_app() -> Starlette:  # pragma: no cover
+def create_context_aware_app() -> Starlette:
     """Build the context-aware test app (echoes request headers via tools)."""
     server = Server(
         "ContextAwareServer",

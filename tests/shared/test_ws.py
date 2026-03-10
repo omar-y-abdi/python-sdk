@@ -30,9 +30,7 @@ from tests.test_helpers import run_uvicorn_in_thread
 SERVER_NAME = "test_server_for_WS"
 
 
-async def handle_read_resource(  # pragma: no cover
-    ctx: ServerRequestContext, params: ReadResourceRequestParams
-) -> ReadResourceResult:
+async def handle_read_resource(ctx: ServerRequestContext, params: ReadResourceRequestParams) -> ReadResourceResult:
     parsed = urlparse(str(params.uri))
     if parsed.scheme == "foobar":
         return ReadResourceResult(
@@ -70,7 +68,7 @@ async def handle_call_tool(  # pragma: no cover
     return CallToolResult(content=[TextContent(type="text", text=f"Called {params.name}")])
 
 
-def _create_server() -> Server:  # pragma: no cover
+def _create_server() -> Server:
     return Server(
         SERVER_NAME,
         on_read_resource=handle_read_resource,
@@ -80,7 +78,7 @@ def _create_server() -> Server:  # pragma: no cover
 
 
 # Test fixtures
-def make_server_app() -> Starlette:  # pragma: no cover
+def make_server_app() -> Starlette:
     """Create test Starlette app with WebSocket transport"""
     server = _create_server()
 
